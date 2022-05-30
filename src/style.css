@@ -5,8 +5,6 @@ p {
 }
 
 .container {
-  justify-content: center;
-  align-items: center;
   width: 80%;
   border: 1px solid black;
   margin: 20px auto;
@@ -29,6 +27,8 @@ p {
 .form-group .form-control {
   width: 70%;
   margin: 0px 8px;
+  display: flex;
+  flex-direction: column;
 }
 
 .w-100 {

@@ -3,8 +3,7 @@ import Posts from './posts.js';
 import './style.css';
 
 const INIT_FORM = {
-  firstName: '',
-  lastName: '',
+  userName: '',
   phoneNum: '',
   emailId: '',
   dob: '',
@@ -13,12 +12,10 @@ const INIT_FORM = {
   sex: 'male',
   country: '',
   terms: '',
-  error: {},
 };
 
 const INIT_FORM_ERROR = {
-  firstName: '',
-  lastName: '',
+  userName: '',
   phoneNum: '',
   emailId: '',
   dob: '',
@@ -34,33 +31,77 @@ export default function App() {
   const [form, setForm] = React.useState(INIT_FORM);
   const [formErrors, setFormErrors] = React.useState(INIT_FORM_ERROR);
 
-  const validateFormField = (key, value) => {
+  const validateFormField = (key) => {
     let error = '';
+    const value = form[key];
+
     switch (key) {
-      case 'firstName':
-        error = value.length < 3 ? 'Should be more than 2 chars length' : '';
+      case 'userName': {
+        const isValidField = /^[A-Za-z]{2,}$/.test(value);
+        error = isValidField ? '' : 'Should be 2 or more characters';
         break;
-      case 'lastName':
-        error = value.length < 3 ? 'Should be more than 2 chars length' : '';
+      }
+      case 'phoneNum': {
+        const isValidField = /^[0-9]{10}$/.test(value);
+        error = isValidField ? '' : 'Please enter 10 digit valid mobile number';
         break;
+      }
+      case 'emailId': {
+        const isValidField = /^[A-Za-z0-9]{2,}@[A-Za-z0-9]{2,}$/.test(value);
+        error = isValidField ? '' : 'Please valid email Id. test@gmail.com';
+        break;
+      }
+      case 'dob': {
+        error = value.length === 0 ? 'Please select the date' : '';
+        break;
+      }
+      case 'password': {
+        const isValidField = /^[A-Za-z0-9@_]{8,}$/.test(value);
+        error = isValidField ? '' : 'Please enter password of min 8 characters';
+        break;
+      }
+      case 'country': {
+        if (value.length > 0 && value !== 'SELECT') {
+          error = '';
+          break;
+        }
+      }
       default:
         console.log('default msgs');
         break;
     }
 
-    console.log(`${value}  -  ${error}`);
-    const isValid = error ? false : true;
-    setFormErrors({ ...formErrors, [key]: error, isValid: isValid });
+    console.log(`${key} - ${value}  -  ${error}`);
+    return error;
   };
 
   const updateForm = (key, value) => {
-    validateFormField(key, value);
     setForm({ ...form, [key]: value });
+    validateFormField(key);
   };
 
   const submitHandler = (e) => {
     e.preventDefault();
-    console.log('form status : ', formErrors.isValid);
+    const fields = [
+      'useName',
+      'phoneNum',
+      'emailId',
+      'dob',
+      'password',
+      'sex',
+      'country',
+      'terms',
+    ];
+    const errors = {};
+
+    for (const key of fields) {
+      const error = validateFormField(key);
+      if (error) {
+        errors[key] = error;
+      }
+    }
+
+    setFormErrors({ ...formErrors, ...errors });
   };
 
   return (
@@ -68,99 +109,89 @@ export default function App() {
       <h1 className="">Form</h1>
       <form className="form" onSubmit={submitHandler}>
         <div className="form-group">
-          <label className="label">First Name</label>
+          <label className="label">Name</label>
           <div className="form-control">
             <input
               type="text"
-              name="firstName"
-              value={form.firstName}
+              name="userName"
+              value={form.userName}
               onChange={(e) => {
-                updateForm('firstName', e.target.value);
+                updateForm('userName', e.target.value);
               }}
             />
-            {formErrors.firstName && (
-              <div className="error">{formErrors.firstName}</div>
-            )}
+            <small className="error">{formErrors.userName}</small>
           </div>
         </div>
-        <div className="form-group">
-          <label className="label">Last Name</label>
-          <div className="form-control">
-            <input
-              type="text"
-              name="lastName"
-              className="form-control"
-              value={form.lastName}
-              onChange={(e) => {
-                updateForm('lastName', e.target.value);
-              }}
-            />
-            {formErrors.lastName && (
-              <div className="error">{formErrors.lastName}</div>
-            )}
-          </div>
-        </div>
+
         <div className="form-group">
           <label class="label" for="phoneNum">
             Phone
           </label>
-          <input
-            type="phone"
-            name="phoneNum"
-            className="form-control"
-            value={form.phoneNum}
-            onChange={(e) => {
-              updateForm('phoneNum', e.target.value);
-            }}
-          />
+          <div className="form-control">
+            <input
+              type="phone"
+              name="phoneNum"
+              value={form.phoneNum}
+              onChange={(e) => {
+                updateForm('phoneNum', e.target.value);
+              }}
+            />
+            <small className="error">{formErrors.phoneNum}</small>
+          </div>
         </div>
         <div className="form-group">
           <label class="label" for="emailId">
             Email Id
           </label>
-          <input
-            type="email"
-            name="emailId"
-            className="form-control"
-            value={form.emailId}
-            onChange={(e) => {
-              updateForm('emailId', e.target.value);
-            }}
-          />
+          <div className="form-control">
+            <input
+              type="email"
+              name="emailId"
+              value={form.emailId}
+              onChange={(e) => {
+                updateForm('emailId', e.target.value);
+              }}
+            />
+            <small className="error">{formErrors.emailId}</small>
+          </div>
         </div>
         <div className="form-group">
           <label class="label" for="dob">
             DOB
           </label>
-          <input
-            type="date"
-            name="dob"
-            className="form-control"
-            value={form.dob}
-            onChange={(e) => {
-              updateForm('dob', e.target.value);
-            }}
-          />
+          <div className="form-control">
+            <input
+              type="date"
+              name="dob"
+              value={form.dob}
+              onChange={(e) => {
+                updateForm('dob', e.target.value);
+              }}
+            />
+            <small className="error">{formErrors.dob}</small>
+          </div>
         </div>
         <div className="form-group">
           <label class="label" for="password">
             Password
           </label>
-          <input
-            type="password"
-            name="password"
-            className="form-control"
-            value={form.password}
-            onChange={(e) => {
-              updateForm('password', e.target.value);
-            }}
-          />
+          <div className="form-control">
+            <input
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={(e) => {
+                updateForm('password', e.target.value);
+              }}
+            />
+            <small className="error">{formErrors.password}</small>
+          </div>
         </div>
         <div className="form-group">
           <label class="label" for="sex">
             Gender
           </label>
-          <div className="form-control">
+          <div className="w-100">
             <input
               type="radio"
               name="male"
@@ -186,6 +217,7 @@ export default function App() {
             Country
           </label>
           <select
+            name="country"
             className="form-control"
             onChange={(e) => {
               updateForm('country', e.target.value);
@@ -195,6 +227,7 @@ export default function App() {
             <option>India</option>
             <option>United States</option>
           </select>
+          <small className="error">{formErrors.country}</small>
         </div>
         <div className="w-100">
           <input
